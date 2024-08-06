@@ -1,70 +1,80 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 
 /// <summary>
 /// Manages the grid of nodes.
 /// </summary>
 public class GridManager : MonoBehaviour
 {
-    public int rows = 5;
-    public int columns = 5;
     public GameObject nodePrefab;
-    public Color[] nodeColors;
+    public RectTransform puzzleLayoutImage;
+    public LineRenderer lineRendererPrefab;
+    private Transform gridParent; // Parent transform for the grid nodes
 
-    private NodeClass[,] grid;
     private NodeFactory nodeFactory;
+    private LineRenderer layoutLineRenderer;
 
     void Awake()
     {
-        nodeFactory = new NodeFactory(nodePrefab, nodeColors);
-    }
+        if (nodePrefab == null)
+        {
+            Debug.LogError("Node prefab is not assigned in the GridManager.");
+        }
 
-    void Start()
-    {
-        GenerateGrid();
-        InvokeRepeating("CheckPuzzleCompletion", 1.0f, 1.0f); // Check every second
+        nodeFactory = new NodeFactory(nodePrefab);
     }
 
     /// <summary>
-    /// Generates the grid of nodes.
+    /// Sets the grid parent transform dynamically.
     /// </summary>
-    public void GenerateGrid()
+    /// <param name="parent">The new grid parent transform.</param>
+    public void SetGridParent(Transform parent)
     {
-        ClearGrid();
-
-        grid = new NodeClass[rows, columns];
-        for (int r = 0; r < rows; r++)
-        {
-            for (int c = 0; c < columns; c++)
-            {
-                Vector3 position = new Vector3(c, r, 0);
-                NodeClass node = nodeFactory.CreateNode(position, transform);
-                grid[r, c] = node;
-            }
-        }
+        gridParent = parent;
     }
 
     /// <summary>
     /// Generates the grid of nodes with specific configuration.
     /// </summary>
-    /// <param name="positions">List of node positions.</param>
-    /// <param name="types">List of node types.</param>
-    /// <param name="colors">List of node colors.</param>
-    public void GenerateGrid(List<Vector2Int> positions, List<NodeType> types, List<Color> colors)
+    public void GenerateGrid(int level, int gridSize)
     {
+        if (gridParent == null)
+        {
+            Debug.LogError("Grid parent is not assigned.");
+            return;
+        }
+
         ClearGrid();
 
-        grid = new NodeClass[rows, columns];
+        ProceduralNodeGenerator.GenerateNodePositions(level, gridSize, out List<Vector2Int> positions, out List<NodeType> types);
+
+        RectTransform parentRect = gridParent.GetComponent<RectTransform>();
+        Vector2 parentSize = parentRect.rect.size;
+        Vector2 nodeSize = new Vector2(parentSize.x / gridSize, parentSize.y / gridSize); // Node size based on grid size
+
+        List<Vector3> nodeWorldPositions = new List<Vector3>();
+
         for (int i = 0; i < positions.Count; i++)
         {
             Vector2Int pos = positions[i];
-            Vector3 position = new Vector3(pos.x, pos.y, 0);
-            GameObject nodeObject = Instantiate(nodePrefab, position, Quaternion.identity, transform);
-            NodeClass node = nodeObject.GetComponent<NodeClass>();
-            node.Initialize(types[i], colors[i]);
-            grid[pos.x, pos.y] = node;
+            Vector3 localPosition = new Vector3(
+                (pos.x * nodeSize.x) - (parentSize.x / 2) + (nodeSize.x / 2),
+                (pos.y * nodeSize.y) - (parentSize.y / 2) + (nodeSize.y / 2),
+                0);
+
+            GameObject nodeObject = nodeFactory.CreateNode(types[i], Vector3.zero, gridParent);
+            nodeObject.transform.localPosition = localPosition;
+
+            // Ensure the node has a BoxCollider2D component for click detection
+            if (nodeObject.GetComponent<BoxCollider2D>() == null)
+            {
+                nodeObject.AddComponent<BoxCollider2D>();
+            }
+
+            nodeWorldPositions.Add(gridParent.TransformPoint(localPosition));
         }
+
+        UpdatePuzzleLayoutImage(nodeWorldPositions);
     }
 
     /// <summary>
@@ -72,19 +82,52 @@ public class GridManager : MonoBehaviour
     /// </summary>
     private void ClearGrid()
     {
-        foreach (Transform child in transform)
+        if (gridParent != null)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in gridParent)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        if (layoutLineRenderer != null)
+        {
+            Destroy(layoutLineRenderer.gameObject);
         }
     }
 
-    private void CheckPuzzleCompletion()
+    /// <summary>
+    /// Updates the puzzle layout image based on node positions.
+    /// </summary>
+    private void UpdatePuzzleLayoutImage(List<Vector3> nodePositions)
     {
-        if (PuzzleChecker.IsPuzzleComplete(grid))
+        if (lineRendererPrefab == null)
         {
-            Debug.Log("Puzzle Completed!");
-            // Implement additional logic for when the puzzle is completed.
-            //load the next level or display a success message.
+            Debug.LogError("LineRenderer prefab is not assigned.");
+            return;
         }
+
+        layoutLineRenderer = Instantiate(lineRendererPrefab, puzzleLayoutImage.transform);
+
+        if (layoutLineRenderer == null)
+        {
+            Debug.LogError("Failed to instantiate LineRenderer.");
+            return;
+        }
+
+        layoutLineRenderer.positionCount = nodePositions.Count;
+        for (int i = 0; i < nodePositions.Count; i++)
+        {
+            Vector3 localPosition = puzzleLayoutImage.InverseTransformPoint(nodePositions[i]);
+            layoutLineRenderer.SetPosition(i, localPosition);
+        }
+
+        // Close the loop to form a shape
+        layoutLineRenderer.loop = true;
+    }
+
+    public LineRenderer GetLayoutLineRenderer()
+    {
+        return layoutLineRenderer;
     }
 }
