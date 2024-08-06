@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static TreeEditor.TreeEditorHelper;
 
 /// <summary>
 /// Represents a single node in the grid

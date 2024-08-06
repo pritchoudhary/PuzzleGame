@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 73.3, y: -133.3}
+  m_AnchoredPosition: {x: 73.29999, y: -133.29999}
   m_SizeDelta: {x: 589.6, y: 235.7}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &27332790
@@ -289,6 +289,7 @@ MonoBehaviour:
   puzzleLayoutUpdater: {fileID: 958359466}
   levelsMenu: {fileID: 702512156}
   gameUI: {fileID: 1807969293}
+  lineDrawingManager: {fileID: 1421777715}
 --- !u!4 &103206811
 Transform:
   m_ObjectHideFlags: 0
@@ -2035,8 +2036,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa205e5eb95b77d469b09e826341844b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linePrefab: {fileID: 3047465311525413409, guid: 5a95a8f27459903489349317d31ba5ff, type: 3}
-  canvasRectTransform: {fileID: 1183950284}
+  linePrefab: {fileID: 3703117976331094213, guid: 5a95a8f27459903489349317d31ba5ff, type: 3}
+  correctConnectionParticle: {fileID: 5417740953798673004, guid: fd6a575bc507a474ea0ce12e1852bfc4, type: 3}
+  incorrectConnectionParticle: {fileID: 3180548107192432342, guid: f0c7df97c6fd3a64b992d86473835934, type: 3}
+  puzzleCompleteParticle: {fileID: 5417740953798673004, guid: fd6a575bc507a474ea0ce12e1852bfc4, type: 3}
 --- !u!4 &1421777716
 Transform:
   m_ObjectHideFlags: 0
@@ -2045,12 +2048,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421777714}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 135.2828, y: 1953.3213, z: 120.74219}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 46182.062, y: 666380.4, z: 10493.334}
+  m_LocalScale: {x: 341.33334, y: 341.33334, z: 341.33334}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1807969294}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1611858151
 GameObject:
@@ -2518,6 +2521,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1421777716}
   - {fileID: 27332789}
   - {fileID: 958359463}
   - {fileID: 1935313319}
@@ -2892,7 +2896,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodePrefab: {fileID: 3667986576066911267, guid: c2161adc77929ac4fac3e3286791e590, type: 3}
   puzzleLayoutImage: {fileID: 958359463}
-  lineRendererPrefab: {fileID: 2433520370524761907, guid: 5a95a8f27459903489349317d31ba5ff, type: 3}
+  lineRendererPrefab: {fileID: 3047465311525413409, guid: 5a95a8f27459903489349317d31ba5ff, type: 3}
 --- !u!4 &2121866818
 Transform:
   m_ObjectHideFlags: 0
@@ -2919,4 +2923,3 @@ SceneRoots:
   - {fileID: 2121866818}
   - {fileID: 103206811}
   - {fileID: 2089045722}
-  - {fileID: 1421777716}
