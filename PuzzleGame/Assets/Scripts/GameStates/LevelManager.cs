@@ -6,12 +6,14 @@ public class LevelManager : MonoBehaviour
     public static LevelManager Instance { get; private set; }
     public GridManager gridManager;
     public PuzzleLayoutUpdater puzzleLayoutUpdater; // Reference to the PuzzleLayoutUpdater
-    public LineDrawingManager lineDrawingManager;
     public GameObject levelsMenu; // Reference to the levels menu UI
     public GameObject gameUI; // Reference to the game UI
+    public LineDrawingManager lineDrawingManager;
 
     private readonly Dictionary<int, GameObject> levelPanels = new();
     private readonly Dictionary<int, Transform> gridParents = new();
+    private LevelConfiguration currentLevelConfiguration;
+    private int currentLevelNumber;
 
     void Awake()
     {
@@ -43,12 +45,14 @@ public class LevelManager : MonoBehaviour
 
     public void LoadLevel(int levelNumber)
     {
+        currentLevelNumber = levelNumber;
         int gridSize = 5 + levelNumber; // Increase grid size with each level
+
         if (gridParents.TryGetValue(levelNumber, out Transform gridParent))
         {
             gridManager.SetGridParent(gridParent); // Set the grid parent dynamically
-            gridManager.GenerateGrid(levelNumber, gridSize);
-            lineDrawingManager.SetGridParent(gridParent); // Set the grid parent for the LineDrawingManager
+            currentLevelConfiguration = gridManager.GenerateGrid(levelNumber, gridSize);
+            lineDrawingManager.SetGridParent(gridParent); // Set the grid parent in LineDrawingManager
         }
 
         LineRenderer layoutLineRenderer = gridManager.GetLayoutLineRenderer();
@@ -68,12 +72,32 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    public LevelConfiguration GetCurrentLevelConfiguration()
+    {
+        return currentLevelConfiguration;
+    }
+
     public void SaveProgress(int level)
     {
         int unlockedLevel = PlayerPrefs.GetInt("UnlockedLevel", 1);
         if (level >= unlockedLevel)
         {
             PlayerPrefs.SetInt("UnlockedLevel", level + 1);
+        }
+    }
+
+    public void LoadNextLevel()
+    {
+        SaveProgress(currentLevelNumber);
+        int nextLevel = currentLevelNumber + 1;
+
+        if (levelPanels.ContainsKey(nextLevel))
+        {
+            LoadLevel(nextLevel);
+        }
+        else
+        {
+            ShowLevelsMenu();
         }
     }
 

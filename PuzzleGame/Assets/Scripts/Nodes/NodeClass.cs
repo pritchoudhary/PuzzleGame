@@ -16,6 +16,7 @@ public class NodeClass : MonoBehaviour
     private Image imageComponent;
     private BoxCollider2D boxCollider;
     private LineDrawingManager lineDrawingManager;
+    public int Index { get; private set; }
 
     private void Awake()
     {
@@ -49,13 +50,15 @@ public class NodeClass : MonoBehaviour
     }
 
     /// <summary>
-    /// Initializes the node with the specified type.
+    /// Initializes the node with the specified type and index.
     /// </summary>
     /// <param name="type">Type of the node.</param>
-    public void Initialize(NodeType type)
+    /// <param name="index">Index of the node.</param>
+    public void Initialize(NodeType type, int index)
     {
         Debug.Log("NodeClass Initialize called on " + gameObject.name);
         _nodeType = type;
+        Index = index;
         if (TryGetComponent<Image>(out imageComponent))
         {
             Debug.Log("Image component is initialized on " + gameObject.name);
@@ -115,6 +118,11 @@ public class NodeClass : MonoBehaviour
         {
             Debug.Log("Clicked outside the node");
         }
+    }
+
+    public bool CheckConnections()
+    {
+        return connectionChecker.IsConnected();
     }
 }
 public enum NodeType

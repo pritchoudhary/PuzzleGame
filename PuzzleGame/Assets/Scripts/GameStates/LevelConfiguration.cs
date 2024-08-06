@@ -1,21 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Configuration for a specific level.
-/// </summary>
 public class LevelConfiguration
 {
     public int Rows { get; }
     public int Columns { get; }
-    public List<Vector2Int> NodePositions { get; }
-    public List<NodeType> NodeTypes { get; }
+    public List<Vector2Int> Positions { get; }
+    public List<NodeType> Types { get; }
+    public List<(int, int)> ExpectedConnections { get; }
 
-    public LevelConfiguration(int rows, int columns, List<Vector2Int> nodePositions, List<NodeType> nodeTypes)
+    public LevelConfiguration(int rows, int columns, List<Vector2Int> positions, List<NodeType> types, List<(int, int)> expectedConnections)
     {
         Rows = rows;
         Columns = columns;
-        NodePositions = nodePositions;
-        NodeTypes = nodeTypes;
+        Positions = positions;
+        Types = types;
+        ExpectedConnections = expectedConnections;
     }
 }

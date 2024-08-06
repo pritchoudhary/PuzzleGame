@@ -1,4 +1,4 @@
-using UnityEditor.Experimental.GraphView;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -6,11 +6,11 @@ using UnityEngine;
 /// </summary>
 public class PuzzleChecker : MonoBehaviour
 {
-    public static bool IsPuzzleComplete(NodeClass[,] grid)
+    public static bool IsPuzzleComplete(LevelConfiguration config, List<(int, int)> playerConnections)
     {
-        foreach (NodeClass node in grid)
+        foreach (var connection in config.ExpectedConnections)
         {
-            if (!node.GetComponent<INodeConnectionChecker>().IsConnected())
+            if (!playerConnections.Contains(connection) && !playerConnections.Contains((connection.Item2, connection.Item1)))
             {
                 return false;
             }

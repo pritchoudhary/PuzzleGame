@@ -36,17 +36,17 @@ public class GridManager : MonoBehaviour
     /// <summary>
     /// Generates the grid of nodes with specific configuration.
     /// </summary>
-    public void GenerateGrid(int level, int gridSize)
+    public LevelConfiguration GenerateGrid(int level, int gridSize)
     {
         if (gridParent == null)
         {
             Debug.LogError("Grid parent is not assigned.");
-            return;
+            return null;
         }
 
         ClearGrid();
 
-        ProceduralNodeGenerator.GenerateNodePositions(level, gridSize, out List<Vector2Int> positions, out List<NodeType> types);
+        ProceduralNodeGenerator.GenerateNodePositions(level, gridSize, out List<Vector2Int> positions, out List<NodeType> types, out List<(int, int)> expectedConnections);
 
         RectTransform parentRect = gridParent.GetComponent<RectTransform>();
         Vector2 parentSize = parentRect.rect.size;
@@ -62,7 +62,7 @@ public class GridManager : MonoBehaviour
                 (pos.y * nodeSize.y) - (parentSize.y / 2) + (nodeSize.y / 2),
                 0);
 
-            GameObject nodeObject = nodeFactory.CreateNode(types[i], Vector3.zero, gridParent);
+            GameObject nodeObject = nodeFactory.CreateNode(types[i], Vector3.zero, gridParent, i);
             nodeObject.transform.localPosition = localPosition;
 
             // Ensure the node has a BoxCollider2D component for click detection
@@ -75,6 +75,8 @@ public class GridManager : MonoBehaviour
         }
 
         UpdatePuzzleLayoutImage(nodeWorldPositions);
+
+        return new LevelConfiguration(gridSize, gridSize, positions, types, expectedConnections);
     }
 
     /// <summary>
